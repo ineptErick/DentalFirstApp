@@ -1,0 +1,24 @@
+[
+    {
+              "id": 1001,
+              "name": "Стоматологическое зеркало",
+              "price": 1250,
+              "image": "https://example.com/images/mirror.jpg",
+              "quantity": 3
+            },
+            {
+              "id": 1002,
+              "name": "Зонд стоматологический",
+              "price": 980,
+              "image": "https://example.com/images/probe.jpg",
+              "quantity": 2
+            },
+            {
+              "id": 1003,
+              "name": "Бор алмазный круглый",
+              "price": 320,
+              "image": "https://example.com/images/round_bur.jpg",
+              "quantity": 1
+            }
+          ]
+        

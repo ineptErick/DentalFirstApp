@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <View
+        android:id="@+id/my_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/blue_back"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="42dp" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@raw/box_image"
+        app:layout_constraintBottom_toBottomOf="@+id/my_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/my_view"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.388" />
+
+    <Button
+        android:id="@+id/btn_catalogue"
+        android:layout_width="343dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="16dp"
+        android:layout_weight="1"
+        android:background="@drawable/button_shape"
+        android:padding="10dp"
+        android:text="Каталог товаров"
+        android:textColor="@color/blue_back"
+        android:textSize="16sp"
+        android:fontFamily="@font/geologica_semibold"
+        app:backgroundTint="@null"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.588"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.711" />
+
+    <TextView
+        android:id="@+id/empty_cart_backText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Корзина"
+        android:textColor="@color/white"
+        android:textSize="32sp"
+        android:fontFamily="@font/geologica_bold"
+        android:textStyle="bold"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+    <TextView
+        android:id="@+id/empty_cart_text"
+        android:layout_width="354dp"
+        android:layout_height="61dp"
+        android:fontFamily="@font/geologica_medium"
+        android:gravity="center"
+        android:text="Сейчас в вашей корзине пусто, перейдите в каталог, добавьте товары в корзину и возвращайтесь чтобы оформить заказ."
+        android:textColor="@color/white"
+        android:textSize="16sp"
+
+        app:layout_constraintBottom_toTopOf="@+id/btn_catalogue"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/empty_cart_backText"
+        app:layout_constraintVertical_bias="0.343" />
+
+    <LinearLayout
+        android:layout_width="359dp"
+        android:layout_height="76dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/button_shape"
+        android:orientation="horizontal"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_catalogue"
+        app:layout_constraintVertical_bias="0.529">
+
+        <Button
+            android:id="@+id/button_home"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Главная"
+            android:drawableTop="@raw/cart_button_main" />
+
+        <Button
+            android:id="@+id/button_catalog"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Каталог"
+            android:drawableTop="@raw/cart_button_catalogue" />
+
+        <Button
+            android:id="@+id/button_cart"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Корзина"
+            android:drawableTop="@raw/cart_button_bucket" />
+
+        <Button
+            android:id="@+id/button_profile"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Профиль"
+            android:drawableTop="@raw/cart_button_profile" />
+
+        <Button
+            android:id="@+id/button_actions"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Действия"
+            android:drawableTop="@raw/cart_button_actions" />
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

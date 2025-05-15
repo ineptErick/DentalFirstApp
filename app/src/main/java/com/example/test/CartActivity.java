@@ -1,0 +1,178 @@
+package com.example.test;
+
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
+public class CartActivity extends AppCompatActivity implements CartAdapter.OnQuantityChangeListener, CartAdapter.OnRemoveListener {
+
+    private CartAdapter adapter;
+    private List<Product> productsInCart; // = new ArrayList<>();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        productsInCart = loadProductsFromJson();
+
+        goToCartScreen();
+        loadCartData(); // Загрузка данных о товарах из SharedPreferences или другого источника
+        adapter.notifyDataSetChanged();
+
+        findViewById(R.id.button_home).setOnClickListener(v -> {
+            // Логика
+        });
+        findViewById(R.id.button_catalog).setOnClickListener(v -> {
+            goToCatalogueScreen();
+        });
+        findViewById(R.id.button_cart).setOnClickListener(v -> {
+            goToCartScreen();
+        });
+        findViewById(R.id.button_profile).setOnClickListener(v -> {
+            // Логика
+        });
+        findViewById(R.id.button_actions).setOnClickListener(v -> {
+            // Логика
+        });
+    }
+
+    private void goToCatalogueScreen(){
+        setContentView(R.layout.catalogue_screen);
+    }
+
+    private void goToCartScreen(){
+        if(productsInCart == null || productsInCart.isEmpty()){
+            // Если товаров у пользователя еще нет
+            setContentView(R.layout.empty_cart);
+            findViewById(R.id.btn_catalogue).setOnClickListener(v -> {
+                goToCatalogueScreen();
+            });
+        }else {
+            // Если у пользователя уже есть товары в корзине
+            setContentView(R.layout.activity_cart);
+            RecyclerView recyclerView = findViewById(R.id.recycler_view);
+
+            // Инициализация адаптера
+            adapter = new CartAdapter(productsInCart, this, this);
+            recyclerView.setAdapter(adapter);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+            // Установка обработчика свайпа
+            ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeToDeleteCallback(adapter));
+            itemTouchHelper.attachToRecyclerView(recyclerView);
+
+            // Обновление текстовых полей с количеством товаров и общей суммой
+            updateTotalAmount();
+
+            findViewById(R.id.btn_checkout).setOnClickListener(v -> {
+                // Логика оформления заказа (переход на следующий экран)
+            });
+
+            // кнопка id.clear_all_button по нажатию удаляет все товары из корзины
+            findViewById(R.id.clear_all_button).setOnClickListener(v -> {
+                clearCart();
+                updateTotalAmount();
+                goToCartScreen();
+            });
+        }
+    }
+
+    // Метод для получения товаров из корзины
+    private List<Product> getProductsInCart() {
+        return productsInCart;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        saveCartData(); // Сохраняем данные при приостановке активности
+    }
+
+    @Override
+    public void onQuantityChange(Product product) {
+        updateTotalAmount();
+    }
+
+    @Override
+    public void onRemove(Product product) {
+        productsInCart.remove(product);
+        adapter.notifyDataSetChanged();
+        updateTotalAmount();
+    }
+
+    protected void updateTotalAmount() {
+        TextView numberGoodsText = findViewById(R.id.number_goods_text);
+        TextView numberGoods = findViewById(R.id.number_goods);
+        TextView rublesText = findViewById(R.id.rubles_text);
+        TextView totalAmount = findViewById(R.id.total_amount);
+
+        int itemCount = productsInCart.size();
+        double totalPrice = 0.0;
+
+        if(!(productsInCart ==null) || !productsInCart.isEmpty()){
+
+            for (Product product : productsInCart) {
+                totalPrice += product.getPrice();
+            }
+            numberGoodsText.setText(String.format("· %d", itemCount));
+            numberGoods.setText(String.format("Товары (%d)", itemCount));
+            rublesText.setText(String.format("· %.2f ₽", totalPrice));
+            totalAmount.setText(String.format("· %.2f ₽", totalPrice));
+        }else{
+            numberGoodsText.setText(String.format("· 0", itemCount));
+            numberGoods.setText(String.format("Товары (0)", itemCount));
+            rublesText.setText(String.format("· 0 ₽", totalPrice));
+            totalAmount.setText(String.format("· 0 ₽", totalPrice));
+        }
+    }
+
+    private void clearCart() {
+        productsInCart.clear(); // Очистка списка товаров в корзине
+        goToCartScreen(); // Обновление экрана корзины
+    }
+
+    private void saveCartData() {
+        SharedPreferences sharedPreferences = getSharedPreferences("cart_prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String jsonString = gson.toJson(productsInCart);
+        editor.putString("cart_data", jsonString);
+        editor.apply();
+    }
+
+    private void loadCartData() {
+        SharedPreferences sharedPreferences = getSharedPreferences("cart_prefs", MODE_PRIVATE);
+        Gson gson = new Gson();
+        String jsonString = sharedPreferences.getString("cart_data", null);
+        if (jsonString != null) {
+            Type type = new TypeToken<List<Product>>() {}.getType();
+            productsInCart = gson.fromJson(jsonString, type);
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+    public List<Product> loadProductsFromJson() {
+        List<Product> products = new ArrayList<>();
+        try {
+            InputStreamReader reader = new InputStreamReader(getAssets().open("tovary_i_kategorii.json"));
+            Type productListType = new TypeToken<List<Product>>() {}.getType();
+            products = new Gson().fromJson(reader, productListType);
+            reader.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return products;
+    }
+}
