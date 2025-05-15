@@ -61,7 +61,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         TextView productQuantity;
         Button btnIncrease;
         Button btnDecrease;
-        // Button btnRemove;
 
         CartViewHolder(View itemView) {
             super(itemView);
@@ -71,8 +70,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             productQuantity = itemView.findViewById(R.id.product_quantity);
             btnIncrease = itemView.findViewById(R.id.btn_increase);
             btnDecrease = itemView.findViewById(R.id.btn_decrease);
-           // btnRemove = itemView.findViewById(R.id.btn_remove);
-        }
+           }
 
         void bind(Product product) {
             Glide.with(itemView.getContext()).load(product.getImageUrl()).into(productImage);
@@ -94,7 +92,6 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
                 }
             });
 
-           // btnRemove.setOnClickListener(v -> removeListener.onRemove(product));
         }
     }
 

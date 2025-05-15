@@ -2,6 +2,8 @@ package com.example.test;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,6 +33,14 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
         loadCartData(); // Загрузка данных о товарах из SharedPreferences или другого источника
         adapter.notifyDataSetChanged();
 
+    }
+
+    private void goToCatalogueScreen(){
+        setContentView(R.layout.catalogue_screen);
+    }
+
+    private void setButtonsBar(){
+
         findViewById(R.id.button_home).setOnClickListener(v -> {
             // Логика
         });
@@ -46,22 +56,66 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
         findViewById(R.id.button_actions).setOnClickListener(v -> {
             // Логика
         });
+
+        Button buttonHome = findViewById(R.id.button_home);
+        Button buttonCatalog = findViewById(R.id.button_catalog);
+        Button buttonCart = findViewById(R.id.button_cart);
+        Button buttonProfile = findViewById(R.id.button_profile);
+        Button buttonActions = findViewById(R.id.button_actions);
+
+        // "Главная"
+        buttonHome.setOnClickListener(v -> {
+            changeButtonImage(buttonHome, R.drawable.cart_button_main_blue, R.drawable.cart_button_main);
+        });
+
+        // "Каталог"
+        buttonCatalog.setOnClickListener(v -> {
+            changeButtonImage(buttonCatalog, R.drawable.cart_button_catalogue_blue, R.drawable.cart_button_catalogue);
+            goToCatalogueScreen();
+        });
+
+        // "Корзина"
+        buttonCart.setOnClickListener(v -> {
+            changeButtonImage(buttonCart, R.drawable.cart_button_bucket_blue, R.drawable.cart_button_bucket);
+            goToCartScreen();
+        });
+
+        // "Профиль"
+        buttonProfile.setOnClickListener(v -> {
+            changeButtonImage(buttonProfile, R.drawable.cart_button_profile_blue, R.drawable.cart_button_profile);
+            // логика
+        });
+
+        // "Акции"
+        buttonActions.setOnClickListener(v -> {
+            changeButtonImage(buttonActions, R.drawable.cart_button_actions_blue, R.drawable.cart_button_actions);
+            // логика
+        });
     }
 
-    private void goToCatalogueScreen(){
-        setContentView(R.layout.catalogue_screen);
+    // Метод для изменения изображения кнопки
+    private void changeButtonImage(Button button, int activeImageResId, int defaultImageResId) {
+        // Меняем изображение на синий аналог
+        button.setCompoundDrawablesWithIntrinsicBounds(0, activeImageResId, 0, 0);
+
+        // Возвращаем изображение обратно через 300 мс
+        new Handler().postDelayed(() -> {
+            button.setCompoundDrawablesWithIntrinsicBounds(0, defaultImageResId, 0, 0);
+        }, 300);
     }
 
     private void goToCartScreen(){
         if(productsInCart == null || productsInCart.isEmpty()){
             // Если товаров у пользователя еще нет
             setContentView(R.layout.empty_cart);
+            setButtonsBar();
             findViewById(R.id.btn_catalogue).setOnClickListener(v -> {
                 goToCatalogueScreen();
             });
         }else {
             // Если у пользователя уже есть товары в корзине
             setContentView(R.layout.activity_cart);
+            setButtonsBar();
             RecyclerView recyclerView = findViewById(R.id.recycler_view);
 
             // Инициализация адаптера
@@ -110,6 +164,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
         productsInCart.remove(product);
         adapter.notifyDataSetChanged();
         updateTotalAmount();
+        goToCartScreen();
     }
 
     protected void updateTotalAmount() {
@@ -122,14 +177,13 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
         double totalPrice = 0.0;
 
         if(!(productsInCart ==null) || !productsInCart.isEmpty()){
-
             for (Product product : productsInCart) {
                 totalPrice += product.getPrice();
             }
-            numberGoodsText.setText(String.format("· %d", itemCount));
+            numberGoodsText.setText(String.format("· %d продуктов", itemCount));
             numberGoods.setText(String.format("Товары (%d)", itemCount));
             rublesText.setText(String.format("· %.2f ₽", totalPrice));
-            totalAmount.setText(String.format("· %.2f ₽", totalPrice));
+            totalAmount.setText(String.format(" %.2f ₽", totalPrice));
         }else{
             numberGoodsText.setText(String.format("· 0", itemCount));
             numberGoods.setText(String.format("Товары (0)", itemCount));

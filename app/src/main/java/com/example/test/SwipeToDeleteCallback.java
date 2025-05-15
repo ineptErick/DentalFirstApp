@@ -4,8 +4,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -31,7 +29,9 @@ public class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
         int position = viewHolder.getAdapterPosition();
-        adapter.removeItem(position); // Удаляем элемент из адаптера
+        if (direction == ItemTouchHelper.LEFT) {
+            adapter.removeItem(position);
+        }
     }
 
     @Override
@@ -43,32 +43,43 @@ public class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallback {
                             int actionState,
                             boolean isCurrentlyActive) {
         View itemView = viewHolder.itemView;
+        float buttonWidth = 94 * recyclerView.getContext().getResources().getDisplayMetrics().density; // Ширина кнопки в пикселях
+        float buttonHeight = itemView.getHeight(); // Высота кнопки равна высоте элемента
 
-        if (dX < 0) { // Свайп влево
-            // Рисуем фон для кнопки удаления
-            float buttonWidth = 200; // Ширина кнопки
-            float buttonHeight = itemView.getHeight(); // Высота кнопки
-
-            // Определяем координаты для рисования кнопки
-            float buttonLeft = itemView.getRight() + dX - buttonWidth;
+        // Если пользователь свайпнул влево
+        if (dX < 0) {
+            float buttonLeft = itemView.getRight() + dX - buttonWidth; // Сдвигаем кнопку влево
             float buttonTop = itemView.getTop();
             float buttonRight = itemView.getRight() + dX;
             float buttonBottom = itemView.getBottom();
 
-            // Рисуем фон кнопки
-            paint.setColor(Color.RED); // Цвет фона для кнопки удаления
+            // Ограничиваем сдвиг кнопки
+            if (buttonLeft < itemView.getRight() - buttonWidth) {
+                buttonLeft = itemView.getRight() - buttonWidth;
+                buttonRight = itemView.getRight();
+            }
+
+            // фон для кнопки удаления
+            paint.setColor(Color.parseColor("#FEE7EB")); // Цвет фона для кнопки удаления
             c.drawRect(buttonLeft, buttonTop, buttonRight, buttonBottom, paint);
 
-            // Рисуем текст "Удалить"
-            paint.setColor(Color.WHITE); // Цвет текста
-            paint.setTextSize(40); // Размер текста
+            // текст "Удалить"
+            paint.setColor(Color.parseColor("#FE113C")); // Цвет текста
+            paint.setTextSize(11 * recyclerView.getContext().getResources().getDisplayMetrics().scaledDensity);
             String text = "Удалить";
             float textWidth = paint.measureText(text);
-            float textX = buttonLeft + (buttonWidth - textWidth) / 2; // Центрируем текст по горизонтали
-            float textY = buttonTop + (buttonHeight / 2) + (paint.getTextSize() / 2.5f); // Центрируем текст по вертикали
+            float textX = buttonLeft + (buttonWidth - textWidth) / 2; // текст по горизонтали
+            float textY = buttonTop + (buttonHeight / 2) + (paint.getTextSize() / 2.5f); // текст по вертикали
 
             c.drawText(text, textX, textY, paint);
         }
+
+        if (isCurrentlyActive && dX < -buttonWidth) {
+            dX = -buttonWidth;
+        }
+        itemView.setTranslationX(dX);
+
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
     }
+
 }
