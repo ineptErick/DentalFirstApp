@@ -80,14 +80,14 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
             btnIncrease.setOnClickListener(v -> {
                 product.setQuantity(product.getQuantity() + 1);
-                quantityChangeListener.onQuantityChange(product);
+                quantityChangeListener.onQuantityChange();
                 notifyItemChanged(getAdapterPosition());
             });
 
             btnDecrease.setOnClickListener(v -> {
                 if (product.getQuantity() > 1) {
                     product.setQuantity(product.getQuantity() - 1);
-                    quantityChangeListener.onQuantityChange(product);
+                    quantityChangeListener.onQuantityChange();
                     notifyItemChanged(getAdapterPosition());
                 }
             });
@@ -96,7 +96,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     }
 
     public interface OnQuantityChangeListener {
-        void onQuantityChange(Product product);
+        void onQuantityChange();
     }
 
     public interface OnRemoveListener {

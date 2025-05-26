@@ -27,12 +27,15 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        productsInCart = loadProductsFromJson();
+        setContentView(R.layout.activity_cart);
+        // Инициализация RecyclerView и адаптера
+        CartAdapter cartAdapter = new CartAdapter(productsInCart, this, this);
 
+
+        productsInCart = loadProductsFromJson();
         goToCartScreen();
         loadCartData(); // Загрузка данных о товарах из SharedPreferences или другого источника
         adapter.notifyDataSetChanged();
-
     }
 
     private void goToCatalogueScreen(){
@@ -155,7 +158,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
     }
 
     @Override
-    public void onQuantityChange(Product product) {
+    public void onQuantityChange() {
         updateTotalAmount();
     }
 
@@ -173,27 +176,29 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
         TextView rublesText = findViewById(R.id.rubles_text);
         TextView totalAmount = findViewById(R.id.total_amount);
 
-        int itemCount = productsInCart.size();
         double totalPrice = 0.0;
+        int totalItems = 0; // Для подсчета общего количества товаров
 
-        if(!(productsInCart ==null) || !productsInCart.isEmpty()){
+        if(productsInCart != null && !productsInCart.isEmpty()){
             for (Product product : productsInCart) {
-                totalPrice += product.getPrice();
+                totalPrice += product.getPrice() * product.getQuantity(); // Учитываем количество
+                totalItems += product.getQuantity(); // Считаем общее количество товаров
             }
-            numberGoodsText.setText(String.format("· %d продуктов", itemCount));
-            numberGoods.setText(String.format("Товары (%d)", itemCount));
-            rublesText.setText(String.format("· %.2f ₽", totalPrice));
-            totalAmount.setText(String.format(" %.2f ₽", totalPrice));
-        }else{
-            numberGoodsText.setText(String.format("· 0", itemCount));
-            numberGoods.setText(String.format("Товары (0)", itemCount));
-            rublesText.setText(String.format("· 0 ₽", totalPrice));
-            totalAmount.setText(String.format("· 0 ₽", totalPrice));
+            numberGoodsText.setText(String.format("· %d продуктов", totalItems)); // Общее количество товаров
+            numberGoods.setText(String.format("Товары (%d)", totalItems)); // Общее количество товаров
+            rublesText.setText(String.format("· %.2f ₽", totalPrice)); // Общая сумма
+            totalAmount.setText(String.format(" %.2f ₽", totalPrice)); // Общая сумма
+        } else {
+            numberGoodsText.setText("· 0");
+            numberGoods.setText("Товары (0)");
+            rublesText.setText("· 0 ₽");
+            totalAmount.setText("· 0 ₽");
         }
     }
 
     private void clearCart() {
         productsInCart.clear(); // Очистка списка товаров в корзине
+        updateTotalAmount();
         goToCartScreen(); // Обновление экрана корзины
     }
 
