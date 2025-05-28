@@ -25,7 +25,6 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
     private TextView numberGoods;
     private TextView rublesText;
     private TextView totalAmount;
-
     private RecyclerView recyclerView;
     private CartAdapter adapter;
 
@@ -49,17 +48,17 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
 
         // Обновление итоговой суммы
         updateTotalAmount();
-        loadCartData(); // Загрузка данных о товарах из SharedPreferences или другого источника
-        adapter.notifyDataSetChanged();
 
         // Установка обработчика свайпа для удаления товаров
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeToDeleteCallback(adapter));
         itemTouchHelper.attachToRecyclerView(recyclerView);
 
-        // Обработка нажатия кнопки оформления заказа
         findViewById(R.id.btn_checkout).setOnClickListener(v -> {
-            // Логика оформления заказа (переход на следующий экран)
+            // Логика оформления заказа
         });
+
+        // Обновление информации в случае изменений в корзине
+        adapter.notifyDataSetChanged();
     }
 
     private void goToCatalogueScreen(){
@@ -189,7 +188,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
         double totalPrice = 0.0;
         int totalItems = 0;
 
-        if(productsInCart != null && !productsInCart.isEmpty()){
+        if (productsInCart != null && !productsInCart.isEmpty()) {
             for (Product product : productsInCart) {
                 totalPrice += product.getPrice() * product.getQuantity(); // Учитываем количество
                 totalItems += product.getQuantity(); // Считаем общее количество товаров
