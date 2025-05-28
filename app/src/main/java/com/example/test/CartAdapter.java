@@ -15,15 +15,14 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder> {
-
     private List<Product> products;
-    private CartActivity cartActivity;
     private OnQuantityChangeListener quantityChangeListener;
+
+    private CartActivity cartActivity;
     private OnRemoveListener removeListener;
 
     public CartAdapter(List<Product> products, OnQuantityChangeListener quantityChangeListener, OnRemoveListener removeListener) {
         this.products = products;
-        this.cartActivity = cartActivity;
         this.quantityChangeListener = quantityChangeListener;
         this.removeListener = removeListener;
     }
@@ -44,9 +43,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
-        Product product = products.get(position);
-        holder.bind(product);
+    public void onBindViewHolder(CartViewHolder holder, int position) {
+        holder.bind(products.get(position));
     }
 
     @Override
@@ -79,19 +77,32 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             productQuantity.setText(String.valueOf(product.getQuantity()));
 
             btnIncrease.setOnClickListener(v -> {
-                product.setQuantity(product.getQuantity() + 1);
-                quantityChangeListener.onQuantityChange();
-                notifyItemChanged(getAdapterPosition());
+                onIncreaseButtonClick(getAdapterPosition());
             });
 
             btnDecrease.setOnClickListener(v -> {
-                if (product.getQuantity() > 1) {
-                    product.setQuantity(product.getQuantity() - 1);
-                    quantityChangeListener.onQuantityChange();
-                    notifyItemChanged(getAdapterPosition());
-                }
+                onDecreaseButtonClick(getAdapterPosition());
             });
+        }
+    }
 
+    public void onIncreaseButtonClick(int position) {
+        Product product = products.get(position);
+        product.setQuantity(product.getQuantity() + 1); // Увеличиваем количество
+        notifyItemChanged(position); // Обновляем элемент списка
+        quantityChangeListener.onQuantityChange(); // Уведомляем об изменении количества
+    }
+
+    public void onDecreaseButtonClick(int position) {
+        Product product = products.get(position);
+        if (product.getQuantity() > 1) { // Проверяем, что количество больше 1
+            product.setQuantity(product.getQuantity() - 1); // Уменьшаем количество
+            notifyItemChanged(position); // Обновляем элемент списка
+            quantityChangeListener.onQuantityChange(); // Уведомляем об изменении количества
+        } else if (product.getQuantity() == 1) { // Если количество равно 1, можно удалить продукт или установить 0
+            products.remove(position); // Удаляем продукт из списка
+            notifyItemRemoved(position); // Уведомляем об удалении элемента
+            quantityChangeListener.onQuantityChange(); // Уведомляем об изменении количества
         }
     }
 

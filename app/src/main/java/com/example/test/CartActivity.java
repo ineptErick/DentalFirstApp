@@ -20,22 +20,46 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CartActivity extends AppCompatActivity implements CartAdapter.OnQuantityChangeListener, CartAdapter.OnRemoveListener {
+    private List<Product> productsInCart;
+    private TextView numberGoodsText;
+    private TextView numberGoods;
+    private TextView rublesText;
+    private TextView totalAmount;
 
+    private RecyclerView recyclerView;
     private CartAdapter adapter;
-    private List<Product> productsInCart; // = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
-        // Инициализация RecyclerView и адаптера
-        CartAdapter cartAdapter = new CartAdapter(productsInCart, this, this);
 
+        numberGoodsText = findViewById(R.id.number_goods_text);
+        numberGoods = findViewById(R.id.number_goods);
+        rublesText = findViewById(R.id.rubles_text);
+        totalAmount = findViewById(R.id.total_amount);
 
         productsInCart = loadProductsFromJson();
-        goToCartScreen();
+
+        // Настройка RecyclerView
+        recyclerView = findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new CartAdapter(productsInCart, this, this);
+        recyclerView.setAdapter(adapter);
+
+        // Обновление итоговой суммы
+        updateTotalAmount();
         loadCartData(); // Загрузка данных о товарах из SharedPreferences или другого источника
         adapter.notifyDataSetChanged();
+
+        // Установка обработчика свайпа для удаления товаров
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeToDeleteCallback(adapter));
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+
+        // Обработка нажатия кнопки оформления заказа
+        findViewById(R.id.btn_checkout).setOnClickListener(v -> {
+            // Логика оформления заказа (переход на следующий экран)
+        });
     }
 
     private void goToCatalogueScreen(){
@@ -43,7 +67,6 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
     }
 
     private void setButtonsBar(){
-
         findViewById(R.id.button_home).setOnClickListener(v -> {
             // Логика
         });
@@ -126,16 +149,8 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
             recyclerView.setAdapter(adapter);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-            // Установка обработчика свайпа
-            ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new SwipeToDeleteCallback(adapter));
-            itemTouchHelper.attachToRecyclerView(recyclerView);
-
             // Обновление текстовых полей с количеством товаров и общей суммой
             updateTotalAmount();
-
-            findViewById(R.id.btn_checkout).setOnClickListener(v -> {
-                // Логика оформления заказа (переход на следующий экран)
-            });
 
             // кнопка id.clear_all_button по нажатию удаляет все товары из корзины
             findViewById(R.id.clear_all_button).setOnClickListener(v -> {
@@ -171,13 +186,8 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnQua
     }
 
     protected void updateTotalAmount() {
-        TextView numberGoodsText = findViewById(R.id.number_goods_text);
-        TextView numberGoods = findViewById(R.id.number_goods);
-        TextView rublesText = findViewById(R.id.rubles_text);
-        TextView totalAmount = findViewById(R.id.total_amount);
-
         double totalPrice = 0.0;
-        int totalItems = 0; // Для подсчета общего количества товаров
+        int totalItems = 0;
 
         if(productsInCart != null && !productsInCart.isEmpty()){
             for (Product product : productsInCart) {
